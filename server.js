@@ -3,15 +3,16 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const handlebars = require('handlebars');
-const cors = require('cors'); // Importar el paquete cors
+const cors = require('cors'); 
 
 const app = express();
 
 // Configuración de CORS
 app.use(cors({
-  origin: 'https://mariapovedapsicologa.netlify.app/',
-  methods: 'GET,POST',
-  allowedHeaders: 'Content-Type'
+  origin: 'https://mariapovedapsicologa.netlify.app', // URL de tu frontend en Netlify
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(express.json());
