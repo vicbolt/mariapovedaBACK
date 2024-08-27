@@ -3,8 +3,17 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const handlebars = require('handlebars');
+const cors = require('cors'); // Importar el paquete cors
 
 const app = express();
+
+// Configurar CORS
+app.use(cors({
+  origin: 'https://tudominio.netlify.app', // Reemplaza con la URL de tu frontend en Netlify
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type'
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -17,15 +26,18 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-app.post('/send-email', async (req, res) => {
+app.post('/send-email', (req, res) => {
   const { nombre, email, telefono, motivo, mensaje } = req.body;
 
-  try {
-    // Leer y compilar la plantilla para María
-    const templatePath1 = path.join(__dirname, 'mail', 'master.html');
-    const template1 = fs.readFileSync(templatePath1, 'utf8');
-    const compiledTemplate1 = handlebars.compile(template1);
-    const htmlToSend1 = compiledTemplate1({
+  // Leer y compilar la plantilla
+  const templatePath1 = path.join(__dirname, 'mail', 'master.html');
+  fs.readFile(templatePath1, 'utf8', (err, template) => {
+    if (err) {
+      return res.status(500).send('Error al leer la plantilla');
+    }
+
+    const compiledTemplate = handlebars.compile(template);
+    const htmlToSend = compiledTemplate({
       nombre,
       email,
       telefono,
@@ -33,22 +45,30 @@ app.post('/send-email', async (req, res) => {
       mensaje
     });
 
-    // Configuración del correo para María
+    // Configuración del correo
     const mailOptions1 = {
       from: 'vicbolt.madrid@gmail.com',
-      to: 'vicbolt.madrid@gmail.com',
+      to: `vicbolt.madrid@gmail.com`, // Enviar a María
       subject: 'Formulario de Contacto',
-      html: htmlToSend1
+      html: htmlToSend
     };
 
-    // Enviar correo a María
-    await transporter.sendMail(mailOptions1);
+    transporter.sendMail(mailOptions1, (error, info) => {
+      if (error) {
+        return res.status(500).send('Error al enviar el correo');
+      }
+      res.status(200).send('Correo enviado con éxito');
+    });
+  });
 
-    // Leer y compilar la plantilla para el usuario
-    const templatePath2 = path.join(__dirname, 'mail', 'user.html');
-    const template2 = fs.readFileSync(templatePath2, 'utf8');
-    const compiledTemplate2 = handlebars.compile(template2);
-    const htmlToSend2 = compiledTemplate2({
+  const templatePath2 = path.join(__dirname, 'mail', 'user.html');
+  fs.readFile(templatePath2, 'utf8', (err, template) => {
+    if (err) {
+      return res.status(500).send('Error al leer la plantilla');
+    }
+
+    const compiledTemplate = handlebars.compile(template);
+    const htmlToSend = compiledTemplate({
       nombre,
       email,
       telefono,
@@ -56,22 +76,21 @@ app.post('/send-email', async (req, res) => {
       mensaje
     });
 
-    // Configuración del correo para el usuario
+    // Configuración del correo
     const mailOptions2 = {
       from: 'vicbolt.madrid@gmail.com',
-      to: email,
+      to: `${email}`, // Envio al usuario
       subject: 'Gracias por contactar conmigo.',
-      html: htmlToSend2
+      html: htmlToSend
     };
 
-    // Enviar correo al usuario
-    await transporter.sendMail(mailOptions2);
-
-    res.status(200).send('Correos enviados con éxito');
-  } catch (error) {
-    console.error('Error al enviar el correo:', error);
-    res.status(500).send('Error al enviar los correos');
-  }
+    transporter.sendMail(mailOptions2, (error, info) => {
+      if (error) {
+        return res.status(500).send('Error al enviar el correo');
+      }
+      res.status(200).send('Correo enviado con éxito');
+    });
+  });
 });
 
 app.listen(3000, () => {
