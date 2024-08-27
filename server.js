@@ -7,9 +7,9 @@ const cors = require('cors'); // Importar el paquete cors
 
 const app = express();
 
-// Configurar CORS
+// Configuración de CORS
 app.use(cors({
-  origin: 'https://tudominio.netlify.app', // Reemplaza con la URL de tu frontend en Netlify
+  origin: 'https://mariapovedapsicologa.netlify.app/',
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type'
 }));
@@ -93,6 +93,8 @@ app.post('/send-email', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Servidor escuchando en el puerto 3000');
+// Usar el puerto asignado por Heroku o el puerto 3000 si no está definido
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
