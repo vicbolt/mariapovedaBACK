@@ -34,7 +34,7 @@ app.post('/send-email', (req, res) => {
   const templatePath1 = path.join(__dirname, 'mail', 'master.html');
   fs.readFile(templatePath1, 'utf8', (err, template) => {
     if (err) {
-      return res.status(500).send('Error al leer la plantilla');
+      return res.status(500).json('Error al leer la plantilla');
     }
 
     const compiledTemplate = handlebars.compile(template);
@@ -56,16 +56,16 @@ app.post('/send-email', (req, res) => {
 
     transporter.sendMail(mailOptions1, (error, info) => {
       if (error) {
-        return res.status(500).send('Error al enviar el correo');
+        return res.status(500).json('Error al enviar el correo');
       }
-      res.status(200).send('Correo enviado con éxito');
+      res.status(200).json('Correo enviado con éxito');
     });
   });
 
   const templatePath2 = path.join(__dirname, 'mail', 'user.html');
   fs.readFile(templatePath2, 'utf8', (err, template) => {
     if (err) {
-      return res.status(500).send('Error al leer la plantilla');
+      return res.status(500).json('Error al leer la plantilla');
     }
 
     const compiledTemplate = handlebars.compile(template);
@@ -87,9 +87,9 @@ app.post('/send-email', (req, res) => {
 
     transporter.sendMail(mailOptions2, (error, info) => {
       if (error) {
-        return res.status(500).send('Error al enviar el correo');
+        return res.status(500).json('Error al enviar el correo');
       }
-      res.status(200).send('Correo enviado con éxito');
+      res.status(200).json('Correo enviado con éxito');
     });
   });
 });
